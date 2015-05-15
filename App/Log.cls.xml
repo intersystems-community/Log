@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="App.Log">
+<IncludeCode>App.Log</IncludeCode>
+<Super>%Persistent</Super>
+<TimeCreated>63685,63064.148177</TimeCreated>
+
+<Parameter name="Null">
+<Description>
+Замещение несуществующих значений</Description>
+<Default>Null</Default>
+</Parameter>
+
+<Property name="EventType">
+<Description>
+Тип события</Description>
+<Type>%String</Type>
+<InitialExpression>"INFO"</InitialExpression>
+<Parameter name="MAXLEN" value="10"/>
+<Parameter name="VALUELIST" value=",NONE,FATAL,ERROR,WARN,INFO,STAT,DEBUG,RAW"/>
+</Property>
+
+<Property name="ClassName">
+<Description>
+Имя класса</Description>
+<Type>%String</Type>
+<Parameter name="MAXLEN" value="256"/>
+</Property>
+
+<Property name="MethodName">
+<Description>
+Имя метода</Description>
+<Type>%String</Type>
+<Parameter name="MAXLEN" value="128"/>
+</Property>
+
+<Property name="Source">
+<Description>
+Строка</Description>
+<Type>%String</Type>
+<Parameter name="MAXLEN" value="2000"/>
+</Property>
+
+<Property name="UserName">
+<Description>
+Имя пользователя</Description>
+<Type>%String</Type>
+<InitialExpression>$username</InitialExpression>
+<Parameter name="MAXLEN" value="128"/>
+</Property>
+
+<Property name="Arguments">
+<Description>
+Аргументы, переданные в метод</Description>
+<Type>%String</Type>
+<Parameter name="MAXLEN" value="32000"/>
+<Parameter name="TRUNCATE" value="1"/>
+</Property>
+
+<Property name="TimeStamp">
+<Description>
+Отметка времени</Description>
+<Type>%TimeStamp</Type>
+<InitialExpression>$zdt($h, 3, 1)</InitialExpression>
+</Property>
+
+<Property name="Message">
+<Description>
+Произвольное сообщение</Description>
+<Type>%String</Type>
+<Parameter name="MAXLEN" value="32000"/>
+<Parameter name="TRUNCATE" value="1"/>
+</Property>
+
+<Property name="ClientIPAddress">
+<Description>
+Сетевой адрес пользователя</Description>
+<Type>%String</Type>
+<InitialExpression>..GetClientAddress()</InitialExpression>
+<Parameter name="MAXLEN" value="32"/>
+</Property>
+
+<Index name="idxEventType">
+<Type>bitmap</Type>
+<Properties>EventType</Properties>
+</Index>
+
+<Index name="idxUserName">
+<Type>bitmap</Type>
+<Properties>UserName</Properties>
+</Index>
+
+<Index name="idxClassName">
+<Type>bitmap</Type>
+<Properties>ClassName</Properties>
+</Index>
+
+<Index name="idxTimeStamp">
+<Type>bitslice</Type>
+<Properties>TimeStamp</Properties>
+</Index>
+
+<Index name="idxClientIPAddress">
+<Properties>ClientIPAddress</Properties>
+</Index>
+
+<Method name="GetClientAddress">
+<Description>
+Определяем сетевой адрес пользователя</Description>
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+	// Если существует сессия CSP, то возмем оттуда
+	#dim %request As %CSP.Request
+	if ($d(%request)) {
+		return %request.CgiEnvs("REMOTE_ADDR")
+	}
+	return $system.Process.ClientIPAddress()
+]]></Implementation>
+</Method>
+
+<Method name="AddRecord">
+<Description>
+Добавление события.
+Желательно использовать не напрямую, а через макросы $$$LogEventXXX().</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pClassName:%String="",pMethodName:%String="",pSource:%String="",pEventType:%String="",pArguments:%String="",pMessage:%String=""</FormalSpec>
+<Implementation><![CDATA[
+	s record = ..%New()
+	s record.Arguments = pArguments
+	s record.ClassName = pClassName
+	s record.EventType = pEventType
+	s record.Message = pMessage
+	s record.MethodName = pMethodName
+	s record.Source = pSource
+	d record.%Save()
+]]></Implementation>
+</Method>
+
+<Method name="GetMethodArgumentsList">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pClassName:%String,pMethodName:%String</FormalSpec>
+<ReturnType>%List</ReturnType>
+<Implementation><![CDATA[
+	s result = ""
+	#dim mDef As %Dictionary.CompiledMethod = ##class(%Dictionary.CompiledMethod).%OpenId(pClassName _ "||" _ pMethodName)
+	if ($IsObject(mDef)) {
+		s result = mDef.FormalSpecParsed
+	}
+	q result
+]]></Implementation>
+</Method>
+
+<Method name="ArgumentsListToString">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pList:%List</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	s result = ""
+	for i=1:1:$ll(pList) {
+		s result = result _ $$$quote($s(i>1=0:"",1:"; ") _ $lg($lg(pList,i))_"=") _ "_$g(" _ $lg($lg(pList,i)) _ ","_$$$quote(..#Null)_")_" _$s(i=$ll(pList)=0:"",1:$$$quote(";"))
+	}
+	q result
+]]></Implementation>
+</Method>
+
+<Method name="GetMethodArguments">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pClassName:%String,pMethodName:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	s list = ..GetMethodArgumentsList(pClassName,pMethodName)
+	s string = ..ArgumentsListToString(list)
+	q string
+]]></Implementation>
+</Method>
+
+<Method name="Test">
+<Description>
+do ##class(App.Log).Test()</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>a=1,b=2,c</FormalSpec>
+<PlaceAfter>GetMethodArguments,GetMethodArgumentsList,ArgumentsListToString</PlaceAfter>
+<Implementation><![CDATA[
+	s d=1
+	s d=2
+	$$$LogWarn("")
+	w $$$StackPlaceCompile
+	//$$$LogEventInfo("catName", "test message")
+	//$$$MethodArgumentsPrepare
+]]></Implementation>
+</Method>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+<DataLocation>^App.LogD</DataLocation>
+<DefaultData>LogDefaultData</DefaultData>
+<IdLocation>^App.LogD</IdLocation>
+<IndexLocation>^App.LogI</IndexLocation>
+<StreamLocation>^App.LogS</StreamLocation>
+<Data name="LogDefaultData">
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>EventType</Value>
+</Value>
+<Value name="3">
+<Value>ClassName</Value>
+</Value>
+<Value name="4">
+<Value>UserName</Value>
+</Value>
+<Value name="5">
+<Value>MethodName</Value>
+</Value>
+<Value name="6">
+<Value>Arguments</Value>
+</Value>
+<Value name="7">
+<Value>TimeStamp</Value>
+</Value>
+<Value name="8">
+<Value>Message</Value>
+</Value>
+<Value name="9">
+<Value>ClientIPAddress</Value>
+</Value>
+<Value name="10">
+<Value>Source</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+</Export>

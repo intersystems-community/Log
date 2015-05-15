@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25" zv="Cache for Windows (x86-64) 2015.1 (Build 429U)" ts="2015-05-15 21:00:53">
+<Routine name="App.Log" type="INC" timestamp="63686,79942.812412"><![CDATA[
+#include %occIO
+
+#define StackPlaceCompile 		 ##expression($$$quote($st($st($st(-1)),"PLACE")))
+#define StackPlace 		$st($st(-1),"PLACE")
+#define CurrentClassName ##expression($$$quote(%classname))
+#define MethodArguments ##expression(##class(App.Log).GetMethodArguments(%classname,$$$CurrentMethod))
+
+#define LogEvent(%type, %message) d ##class(App.Log).AddRecord($$$CurrentClassName,$$$CurrentMethod,$$$StackPlace,%type,$$$MethodArguments,%message)
+#define LogNone(%message) 		$$$LogEvent("NONE", %message)
+#define LogError(%message) 		$$$LogEvent("ERROR", %message)
+#define LogFatal(%message) 		$$$LogEvent("FATAL", %message)
+#define LogWarn(%message) 		$$$LogEvent("WARN", %message)
+#define LogInfo(%message) 		$$$LogEvent("INFO", %message)
+#define LogStat(%message) 		$$$LogEvent("STAT", %message)
+#define LogDebug(%message) 		$$$LogEvent("DEBUG", %message)
+#define LogRaw(%message) 		$$$LogEvent("RAW", %message)
+#;define LogWarn	$$$LogEvent("WARN", "")
+
+]]></Routine>
+</Export>
