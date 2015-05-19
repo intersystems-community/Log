@@ -136,15 +136,26 @@
 ]]></Implementation>
 </Method>
 
+<Method name="GetMethodArguments">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>ClassName:%String,MethodName:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	Set list = ..GetMethodArgumentsList(ClassName,MethodName)
+	Set string = ..ArgumentsListToString(list)
+	Return string
+]]></Implementation>
+</Method>
+
 <Method name="GetMethodArgumentsList">
 <ClassMethod>1</ClassMethod>
-<FormalSpec>pClassName:%String,pMethodName:%String</FormalSpec>
+<FormalSpec>ClassName:%String,MethodName:%String</FormalSpec>
 <ReturnType>%List</ReturnType>
 <Implementation><![CDATA[
 	Set result = ""
-	#dim mDef As %Dictionary.CompiledMethod = ##class(%Dictionary.CompiledMethod).%OpenId(pClassName _ "||" _ pMethodName)
-	If ($IsObject(mDef)) {
-		Set result = mDef.FormalSpecParsed
+	Set def = ##class(%Dictionary.CompiledMethod).%OpenId(ClassName _ "||" _ MethodName)
+	If ($IsObject(def)) {
+		Set result = def.FormalSpecParsed
 	}
 	Return result
 ]]></Implementation>
@@ -152,38 +163,16 @@
 
 <Method name="ArgumentsListToString">
 <ClassMethod>1</ClassMethod>
-<FormalSpec>pList:%List</FormalSpec>
+<FormalSpec>List:%List</FormalSpec>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
 	Set result = ""
-	For i=1:1:$ll(pList) {
-		S result = result _ $$$quote($s(i>1=0:"",1:"; ") _ $lg($lg(pList,i))_"=") _ "_$g(" _ $lg($lg(pList,i)) _ ","_$$$quote(..#Null)_")_" _$s(i=$ll(pList)=0:"",1:$$$quote(";"))
+	For i=1:1:$ll(List) {
+		Set result = result _ $$$quote($s(i>1=0:"",1:"; ") _ $lg($lg(List,i))_"=") 
+		_ "_$g(" _ $lg($lg(List,i)) _ ","_$$$quote(..#Null)_")_" 
+		_$s(i=$ll(List)=0:"",1:$$$quote(";"))
 	}
 	Return result
-]]></Implementation>
-</Method>
-
-<Method name="GetMethodArguments">
-<ClassMethod>1</ClassMethod>
-<FormalSpec>pClassName:%String,pMethodName:%String</FormalSpec>
-<ReturnType>%String</ReturnType>
-<Implementation><![CDATA[
-	Set list = ..GetMethodArgumentsList(pClassName,pMethodName)
-	Set string = ..ArgumentsListToString(list)
-	Return string
-]]></Implementation>
-</Method>
-
-<Method name="Test">
-<Description>
-do ##class(App.Log).Test()</Description>
-<ClassMethod>1</ClassMethod>
-<FormalSpec>a=1,b=2,c</FormalSpec>
-<PlaceAfter>GetMethodArguments,GetMethodArgumentsList,ArgumentsListToString</PlaceAfter>
-<Implementation><![CDATA[
-	Set d=1
-	Set d=2
-	$$$LogWarn("Cooбщение")
 ]]></Implementation>
 </Method>
 

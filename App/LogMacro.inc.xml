@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="Cache" version="25" zv="Cache for Windows (x86-64) 2015.1 (Build 429U)" ts="2015-05-19 18:25:07">
-<Routine name="App.Log" type="INC" timestamp="63691,66294.181373"><![CDATA[
+<Export generator="Cache" version="25" zv="Cache for Windows (x86-64) 2015.1 (Build 429U)" ts="2015-05-19 20:21:37">
+<Routine name="App.LogMacro" type="INC" timestamp="63691,73249.952234"><![CDATA[
 #define StackPlace 		$st($st(-1),"PLACE")
 #define CurrentClass 	##Expression($$$quote(%classname))
 #define CurrentMethod 	##Expression($$$quote(%methodname))
 
-#define MethodArguments ##Expression(##class(App.Log).GetMethodArguments(%classname,$$$CurrentMethod))
+#define MethodArguments ##Expression(##class(App.Log).GetMethodArguments(%classname,%methodname))
 
 #define LogEvent(%type, %message) Do ##class(App.Log).AddRecord($$$CurrentClass,$$$CurrentMethod,$$$StackPlace,%type,$$$MethodArguments,%message)
 #define LogNone(%message) 		$$$LogEvent("NONE", %message)
