@@ -36,7 +36,7 @@
 
 <Property name="Source">
 <Description>
-Строка</Description>
+Строка int кода</Description>
 <Type>%String</Type>
 <Parameter name="MAXLEN" value="2000"/>
 </Property>
@@ -59,7 +59,7 @@
 
 <Property name="TimeStamp">
 <Description>
-Отметка времени</Description>
+Дата/время</Description>
 <Type>%TimeStamp</Type>
 <InitialExpression>$zdt($h, 3, 1)</InitialExpression>
 </Property>
@@ -109,30 +109,30 @@
 Определяем сетевой адрес пользователя</Description>
 <ClassMethod>1</ClassMethod>
 <Implementation><![CDATA[
-	// Если существует сессия CSP, то возмем оттуда
+	// Если существует сессия CSP, то возьмём оттуда
 	#dim %request As %CSP.Request
-	if ($d(%request)) {
-		return %request.CgiEnvs("REMOTE_ADDR")
+	If ($d(%request)) {
+		Return %request.CgiEnvs("REMOTE_ADDR")
 	}
-	return $system.Process.ClientIPAddress()
+	Return $system.Process.ClientIPAddress()
 ]]></Implementation>
 </Method>
 
 <Method name="AddRecord">
 <Description>
 Добавление события.
-Желательно использовать не напрямую, а через макросы $$$LogEventXXX().</Description>
+Использовать не напрямую, а через макросы $$$LogEventTYPE().</Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec>pClassName:%String="",pMethodName:%String="",pSource:%String="",pEventType:%String="",pArguments:%String="",pMessage:%String=""</FormalSpec>
+<FormalSpec>ClassName:%String="",MethodName:%String="",Source:%String="",EventType:%String="",Arguments:%String="",Message:%String=""</FormalSpec>
 <Implementation><![CDATA[
-	s record = ..%New()
-	s record.Arguments = pArguments
-	s record.ClassName = pClassName
-	s record.EventType = pEventType
-	s record.Message = pMessage
-	s record.MethodName = pMethodName
-	s record.Source = pSource
-	d record.%Save()
+	Set record = ..%New()
+	Set record.Arguments = Arguments
+	Set record.ClassName = ClassName
+	Set record.EventType = EventType
+	Set record.Message = Message
+	Set record.MethodName = MethodName
+	Set record.Source = Source
+	Do record.%Save()
 ]]></Implementation>
 </Method>
 
@@ -141,12 +141,12 @@
 <FormalSpec>pClassName:%String,pMethodName:%String</FormalSpec>
 <ReturnType>%List</ReturnType>
 <Implementation><![CDATA[
-	s result = ""
+	Set result = ""
 	#dim mDef As %Dictionary.CompiledMethod = ##class(%Dictionary.CompiledMethod).%OpenId(pClassName _ "||" _ pMethodName)
-	if ($IsObject(mDef)) {
-		s result = mDef.FormalSpecParsed
+	If ($IsObject(mDef)) {
+		Set result = mDef.FormalSpecParsed
 	}
-	q result
+	Return result
 ]]></Implementation>
 </Method>
 
@@ -155,11 +155,11 @@
 <FormalSpec>pList:%List</FormalSpec>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
-	s result = ""
-	for i=1:1:$ll(pList) {
-		s result = result _ $$$quote($s(i>1=0:"",1:"; ") _ $lg($lg(pList,i))_"=") _ "_$g(" _ $lg($lg(pList,i)) _ ","_$$$quote(..#Null)_")_" _$s(i=$ll(pList)=0:"",1:$$$quote(";"))
+	Set result = ""
+	For i=1:1:$ll(pList) {
+		S result = result _ $$$quote($s(i>1=0:"",1:"; ") _ $lg($lg(pList,i))_"=") _ "_$g(" _ $lg($lg(pList,i)) _ ","_$$$quote(..#Null)_")_" _$s(i=$ll(pList)=0:"",1:$$$quote(";"))
 	}
-	q result
+	Return result
 ]]></Implementation>
 </Method>
 
@@ -168,9 +168,9 @@
 <FormalSpec>pClassName:%String,pMethodName:%String</FormalSpec>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
-	s list = ..GetMethodArgumentsList(pClassName,pMethodName)
-	s string = ..ArgumentsListToString(list)
-	q string
+	Set list = ..GetMethodArgumentsList(pClassName,pMethodName)
+	Set string = ..ArgumentsListToString(list)
+	Return string
 ]]></Implementation>
 </Method>
 
@@ -181,12 +181,10 @@ do ##class(App.Log).Test()</Description>
 <FormalSpec>a=1,b=2,c</FormalSpec>
 <PlaceAfter>GetMethodArguments,GetMethodArgumentsList,ArgumentsListToString</PlaceAfter>
 <Implementation><![CDATA[
-	s d=1
-	s d=2
+	Set d=1
+	Set d=2
 	$$$LogWarn("")
-	w $$$StackPlaceCompile
-	//$$$LogEventInfo("catName", "test message")
-	//$$$MethodArgumentsPrepare
+	Write $$$StackPlaceCompile
 ]]></Implementation>
 </Method>
 
