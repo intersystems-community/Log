@@ -183,8 +183,7 @@ do ##class(App.Log).Test()</Description>
 <Implementation><![CDATA[
 	Set d=1
 	Set d=2
-	$$$LogWarn("")
-	Write $$$StackPlaceCompile
+	$$$LogWarn("Cooбщение")
 ]]></Implementation>
 </Method>
 
