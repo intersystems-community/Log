@@ -10,7 +10,7 @@
 do ##class(App.Use).Test()</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec><![CDATA[a:%Integer=1,&b=2]]></FormalSpec>
-<Implementation><![CDATA[	$$$LogWarn("Текст")
+<Implementation><![CDATA[	$$$LogWarn("User message") // just place this macro in user code you wish to log
 ]]></Implementation>
 </Method>
 </Class>
