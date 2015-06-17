@@ -6,13 +6,13 @@
 
 <Parameter name="Null">
 <Description>
-Замещение несуществующих значений</Description>
+Replacement for missing values</Description>
 <Default>Null</Default>
 </Parameter>
 
 <Property name="EventType">
 <Description>
-Тип события</Description>
+Type of event</Description>
 <Type>%String</Type>
 <InitialExpression>"INFO"</InitialExpression>
 <Parameter name="MAXLEN" value="10"/>
@@ -21,28 +21,28 @@
 
 <Property name="ClassName">
 <Description>
-Имя класса</Description>
+Name of class, where event happened</Description>
 <Type>%String</Type>
 <Parameter name="MAXLEN" value="256"/>
 </Property>
 
 <Property name="MethodName">
 <Description>
-Имя метода</Description>
+Name of method, where event happened</Description>
 <Type>%String</Type>
 <Parameter name="MAXLEN" value="128"/>
 </Property>
 
 <Property name="Source">
 <Description>
-Строка int кода</Description>
+Line of int code</Description>
 <Type>%String</Type>
 <Parameter name="MAXLEN" value="2000"/>
 </Property>
 
 <Property name="UserName">
 <Description>
-Имя пользователя</Description>
+Cache user</Description>
 <Type>%String</Type>
 <InitialExpression>$username</InitialExpression>
 <Parameter name="MAXLEN" value="128"/>
@@ -50,7 +50,7 @@
 
 <Property name="Arguments">
 <Description>
-Аргументы, переданные в метод</Description>
+Arguments' values passed to method</Description>
 <Type>%String</Type>
 <Parameter name="MAXLEN" value="32000"/>
 <Parameter name="TRUNCATE" value="1"/>
@@ -58,14 +58,14 @@
 
 <Property name="TimeStamp">
 <Description>
-Дата/время</Description>
+Date and time</Description>
 <Type>%TimeStamp</Type>
 <InitialExpression>$zdt($h, 3, 1)</InitialExpression>
 </Property>
 
 <Property name="Message">
 <Description>
-Произвольное сообщение</Description>
+User message</Description>
 <Type>%String</Type>
 <Parameter name="MAXLEN" value="32000"/>
 <Parameter name="TRUNCATE" value="1"/>
@@ -73,7 +73,7 @@
 
 <Property name="ClientIPAddress">
 <Description>
-Сетевой адрес пользователя</Description>
+User IP address</Description>
 <Type>%String</Type>
 <InitialExpression>..GetClientAddress()</InitialExpression>
 <Parameter name="MAXLEN" value="32"/>
@@ -105,10 +105,10 @@
 
 <Method name="GetClientAddress">
 <Description>
-Определяем сетевой адрес пользователя</Description>
+Determine user IP address</Description>
 <ClassMethod>1</ClassMethod>
 <Implementation><![CDATA[
-	// Если существует сессия CSP, то возьмём оттуда
+	// %CSP.Session source is preferable
 	#dim %request As %CSP.Request
 	If ($d(%request)) {
 		Return %request.CgiEnvs("REMOTE_ADDR")
@@ -119,8 +119,8 @@
 
 <Method name="AddRecord">
 <Description>
-Добавление события.
-Использовать не напрямую, а через макросы $$$LogEventTYPE().</Description>
+Add new log event
+Use via $$$LogEventTYPE().</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>ClassName:%String="",MethodName:%String="",Source:%String="",EventType:%String="",Arguments:%String="",Message:%String=""</FormalSpec>
 <Implementation><![CDATA[
@@ -136,6 +136,8 @@
 </Method>
 
 <Method name="GetMethodArguments">
+<Description>
+Entry point to get method arguments string </Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>ClassName:%String,MethodName:%String</FormalSpec>
 <ReturnType>%String</ReturnType>
@@ -147,6 +149,8 @@
 </Method>
 
 <Method name="GetMethodArgumentsList">
+<Description>
+Get a list of method arguments</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>ClassName:%String,MethodName:%String</FormalSpec>
 <ReturnType>%List</ReturnType>
@@ -161,6 +165,8 @@
 </Method>
 
 <Method name="ArgumentsListToString">
+<Description>
+Convert list of method arguments to string</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>List:%List</FormalSpec>
 <ReturnType>%String</ReturnType>
