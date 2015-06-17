@@ -13,5 +13,14 @@ do ##class(App.Use).Test()</Description>
 <Implementation><![CDATA[	$$$LogWarn("User message") // just place this macro in user code you wish to log
 ]]></Implementation>
 </Method>
+
+<Method name="TestWithObjects">
+<Description>
+do ##class(App.Use).TestWithObjects()</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>a:%Integer=1,b:%ZEN.proxyObject</FormalSpec>
+<Implementation><![CDATA[	$$$LogWarn("User message") // just place this macro in user code you wish to log
+]]></Implementation>
+</Method>
 </Class>
 </Export>

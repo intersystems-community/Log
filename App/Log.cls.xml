@@ -174,10 +174,78 @@ Convert list of method arguments to string</Description>
 	Set result = ""
 	For i=1:1:$ll(List) {
 		Set result = result _ $$$quote($s(i>1=0:"",1:"; ") _ $lg($lg(List,i))_"=") 
-		_ "_$g(" _ $lg($lg(List,i)) _ ","_$$$quote(..#Null)_")_" 
+		_ ..GetArgumentValue($lg($lg(List,i)),$lg($lg(List,i),2))
 		_$s(i=$ll(List)=0:"",1:$$$quote(";"))
 	}
 	Return result
+]]></Implementation>
+</Method>
+
+<Method name="GetArgumentValue">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Name:%String,Class:%Dictionary.CacheClassname</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	If $ClassMethod(Class, "%Extends", "%RegisteredObject") {
+		// it's an object
+		Return "_##class(App.Log).SerializeObject("_Name _ ")_"
+	} Else {
+		// it's a datatype
+		Return "_$g(" _ Name _ ","_$$$quote(..#Null)_")_"
+	}
+]]></Implementation>
+</Method>
+
+<Method name="SerializeObject">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Object</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	Return:'$IsObject(Object) Object
+	Return ..WriteJSONFromObject(Object)
+]]></Implementation>
+</Method>
+
+<Method name="WriteJSONFromObject">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Object</FormalSpec>
+<ProcedureBlock>0</ProcedureBlock>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+    // Create a string that we will redirect to
+    Set myStr = ""
+
+    Use $io::("^"_$ZNAME)
+ 
+    // Enable redirection
+    Do ##class(%Device).ReDirectIO(1)
+ 
+    // Any write statements here will be redirected to the labels defined below
+    Do ##class(%ZEN.Auxiliary.jsonProvider).%ObjectToJSON(Object)
+ 
+    // Disable redirection
+    do ##class(%Device).ReDirectIO(0)
+    
+    Return myStr
+ 
+    // Labels that allow for IO redirection
+    // Read Character - we don't care about reading
+rchr(c)      quit
+    // Read a string - we don't care about reading
+rstr(sz,to)  quit
+    // Write a character - call the output label
+wchr(s)      do output($char(s))  quit
+    // Write a form feed - call the output label
+wff()        do output($char(12))  quit
+    // Write a newline - call the output label
+wnl()        do output($char(13,10))  quit
+    // Write a string - call the output label
+wstr(s)      do output(s)  quit
+    // Write a tab - call the output label
+wtab(s)      do output($char(9))  quit
+    // Output label - this is where you would handle what you actually want to do.
+    // in our case, we want to write to myStr
+output(s)    set myStr =myStr_s quit
 ]]></Implementation>
 </Method>
 
