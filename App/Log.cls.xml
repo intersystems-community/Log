@@ -213,7 +213,7 @@ Convert list of method arguments to string</Description>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
     // Create a string that we will redirect to
-    Set myStr = ""
+    Set Str = ""
 
     Use $io::("^"_$ZNAME)
  
@@ -226,7 +226,7 @@ Convert list of method arguments to string</Description>
     // Disable redirection
     Do ##class(%Device).ReDirectIO(0)
     
-    Return myStr
+    Return Str
  
     // Labels that allow for IO redirection
     // Read Character - we don't care about reading
@@ -245,7 +245,7 @@ wstr(s)      Do output(s)  Quit
 wtab(s)      Do output($char(9))  Quit
     // Output label - this is where you would handle what you actually want to do.
     // in our case, we want to write to myStr
-output(s)    Set myStr =myStr_s Quit
+output(s)    Set Str =Str_s Quit
 ]]></Implementation>
 </Method>
 
