@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
 <Class name="App.Log">
-<IncludeCode>App.Log</IncludeCode>
 <Super>%Persistent</Super>
 <TimeCreated>63685,63064.148177</TimeCreated>
 
