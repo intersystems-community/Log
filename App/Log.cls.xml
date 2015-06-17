@@ -244,8 +244,8 @@ wstr(s)      Do output(s)  Quit
     // Write a tab - call the output label
 wtab(s)      Do output($char(9))  Quit
     // Output label - this is where you would handle what you actually want to do.
-    // in our case, we want to write to myStr
-output(s)    Set Str =Str_s Quit
+    // in our case, we want to write to Str
+output(s)    Set Str = Str_s Quit
 ]]></Implementation>
 </Method>
 
