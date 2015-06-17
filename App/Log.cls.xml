@@ -183,10 +183,10 @@ Convert list of method arguments to string</Description>
 
 <Method name="GetArgumentValue">
 <ClassMethod>1</ClassMethod>
-<FormalSpec>Name:%String,Class:%Dictionary.CacheClassname</FormalSpec>
+<FormalSpec>Name:%String,ClassName:%Dictionary.CacheClassname</FormalSpec>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
-	If $ClassMethod(Class, "%Extends", "%RegisteredObject") {
+	If $ClassMethod(ClassName, "%Extends", "%RegisteredObject") {
 		// it's an object
 		Return "_##class(App.Log).SerializeObject("_Name _ ")_"
 	} Else {
@@ -246,6 +246,39 @@ wtab(s)      do output($char(9))  quit
     // Output label - this is where you would handle what you actually want to do.
     // in our case, we want to write to myStr
 output(s)    set myStr =myStr_s quit
+]]></Implementation>
+</Method>
+
+<Method name="LoadContext">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Id</FormalSpec>
+<ProcedureBlock>0</ProcedureBlock>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	Return:'..%ExistsId(Id) $$$OK
+	Set Obj = ..%OpenId(Id)
+	Set Arguments = Obj.Arguments
+	Set List = ..GetMethodArgumentsList(Obj.ClassName,Obj.MethodName)
+	For i=1:1:$Length(Arguments,";")-1 {
+		Set Argument = $Piece(Arguments,";",i)
+		//w $lg($lg(List,i)),!,$Piece(Argument,"=",2),!
+		Set @$lg($lg(List,i)) = ..DeserializeObject($Piece(Argument,"=",2),$lg($lg(List,i),2))
+	}
+	Kill Obj,Arguments,Argument,i,Id,List
+]]></Implementation>
+</Method>
+
+<Method name="DeserializeObject">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>String,ClassName</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	If $ClassMethod(ClassName, "%Extends", "%RegisteredObject") {
+		// it's an object
+		Set st = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(String,,.obj)
+		Return:$$$ISOK(st) obj
+	}
+	Return String
 ]]></Implementation>
 </Method>
 
