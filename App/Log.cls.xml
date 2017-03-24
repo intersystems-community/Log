@@ -40,6 +40,13 @@ Line of int code</Description>
 <Parameter name="MAXLEN" value="2000"/>
 </Property>
 
+<Property name="SourceCLS">
+<Description>
+Line of cls code</Description>
+<Type>%String</Type>
+<Parameter name="MAXLEN" value="2000"/>
+</Property>
+
 <Property name="UserName">
 <Description>
 Cache user</Description>
@@ -131,6 +138,8 @@ Use via $$$LogEventTYPE().</Description>
 	Set record.Message = Message
 	Set record.MethodName = MethodName
 	Set record.Source = Source
+	do ..GetClassSourceLine($Piece(Source, " ", 1, *-1), .SourceCLS)
+	Set record.SourceCLS = SourceCLS
 	Do record.%Save()
 ]]></Implementation>
 </Method>
@@ -142,7 +151,7 @@ Entry point to get method arguments string </Description>
 <FormalSpec>ClassName:%String,MethodName:%String</FormalSpec>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
-	Set list = ..GetMethodArgumentsList(ClassName,MethodName)
+	Set list = ..GetMethodArgumentsList(ClassName, MethodName)
 	Set string = ..ArgumentsListToString(list)
 	Return string
 ]]></Implementation>
@@ -212,21 +221,32 @@ Convert list of method arguments to string</Description>
 <ProcedureBlock>0</ProcedureBlock>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
-    // Create a string that we will redirect to
-    Set Str = ""
+	Set OldIORedirected = ##class(%Device).ReDirectIO()
+	Set OldMnemonic = ##class(%Device).GetMnemonicRoutine()
+	Set OldIO = $io
+	Try {
+		Set Str=""
 
-    Use $io::("^"_$ZNAME)
- 
-    // Enable redirection
-    Do ##class(%Device).ReDirectIO(1)
- 
-    // Any write statements here will be redirected to the labels defined below
-    Do ##class(%ZEN.Auxiliary.jsonProvider).%ObjectToJSON(Object)
- 
-    // Disable redirection
-    Do ##class(%Device).ReDirectIO(0)
-    
-    Return Str
+		//Redirect IO to the current routine - makes use of the labels defined below
+		Use $io::("^"_$ZNAME)
+
+		//Enable redirection
+		Do ##class(%Device).ReDirectIO(1)
+
+		Do ##class(%ZEN.Auxiliary.jsonProvider).%ObjectToJSON(Object)
+	} Catch Ex {
+		Set Str = ""
+	}
+
+	//Return to original redirection/mnemonic routine settings
+	If (OldMnemonic '= "") {
+		Use OldIO::("^"_OldMnemonic)
+	} Else {
+		Use OldIO
+	}
+	Do ##class(%Device).ReDirectIO(OldIORedirected)
+
+	Quit Str
  
     // Labels that allow for IO redirection
     // Read Character - we don't care about reading
@@ -281,6 +301,55 @@ output(s)    Set Str = Str_s Quit
 ]]></Implementation>
 </Method>
 
+<Method name="GetClassSourceLine">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>IntLocation:%String,*ClsLocation:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    Set Status = $$$OK
+    Set ClsLocation = ""
+    Try {
+        Set MethodAndLine = $Piece(IntLocation,"^",1)
+        Set IntName = $Piece(IntLocation,"^",2)
+        Set Tag = $Piece(MethodAndLine,"+")
+        Set RelativeOffset = $Piece(MethodAndLine,"+",2)
+        
+        // Get routine text to find the absolute offset of tTag
+        Set TagOffset = 0
+        Set EndPos = 0
+        Set TextLines = 0
+        For {
+            Set Line = $Text(@("+"_$Increment(TextLines)_ "^" _ IntName))
+            Quit:Line=""
+            
+            // Example:
+            // zRun() public {
+            // This relies on an assumption that methods will be sorted alphabetically and won't contain labels.
+            If $Extract(Line, 1, $Length(Tag)) = Tag {
+                Set TagOffset = TextLines //tTextLines is the counter.
+                Set EndPos = $Length(Line)
+                Quit
+            }
+        }
+        
+        // The absolute offset of the line in the .int file is the tag's offset plus the offset within it.
+        Set Offset = TagOffset + RelativeOffset
+        Set Status = ##class(%Studio.Debugger).SourceLine(IntName, Offset, 0, Offset, EndPos,, .Map)
+        If $$$ISERR(Status) {
+            Quit
+        }
+        If $Data(Map("CLS", 1)) {
+            Set $ListBuild(Class, Method, Line, EndPos, Namespace) = Map("CLS", 1)
+            Set Class = $$$comMemberKeyGet(Class, $$$cCLASSmethod, Method, $$$cMETHorigin)
+            Set ClsLocation = Class _ ":" _ Method _ "+" _ Line
+        }
+    } Catch Ex {
+        Set Status = Ex.AsStatus()
+    }
+    Quit Status
+]]></Implementation>
+</Method>
+
 <Storage name="Default">
 <Type>%Library.CacheStorage</Type>
 <DataLocation>^App.LogD</DataLocation>
@@ -318,6 +387,9 @@ output(s)    Set Str = Str_s Quit
 </Value>
 <Value name="10">
 <Value>Source</Value>
+</Value>
+<Value name="11">
+<Value>SourceCLS</Value>
 </Value>
 </Data>
 </Storage>
