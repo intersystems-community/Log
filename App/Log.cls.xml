@@ -271,19 +271,19 @@ output(s)    Set Str = Str_s Quit
 
 <Method name="LoadContext">
 <ClassMethod>1</ClassMethod>
-<FormalSpec>Id</FormalSpec>
+<FormalSpec>zzId</FormalSpec>
 <ProcedureBlock>0</ProcedureBlock>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	Return:'..%ExistsId(Id) $$$OK
-	Set Obj = ..%OpenId(Id)
-	Set Arguments = Obj.Arguments
-	Set List = ..GetMethodArgumentsList(Obj.ClassName,Obj.MethodName)
-	For i=1:1:$Length(Arguments,";")-1 {
-		Set Argument = $Piece(Arguments,";",i)
-		Set @$lg($lg(List,i)) = ..DeserializeObject($Piece(Argument,"=",2),$lg($lg(List,i),2))
+	New zzObj, zzArguments, zzArgument, zzi, zzList
+	Return:'..%ExistsId(zzId) $$$OK
+	Set zzObj = ..%OpenId(zzId)
+	Set zzArguments = zzObj.Arguments
+	Set zzList = ..GetMethodArgumentsList(zzObj.ClassName,zzObj.MethodName)
+	For zzi=1:1:$Length(zzArguments, ";")-1 {
+		Set zzArgument = $Piece(zzArguments,";",zzi)
+		Set @$lg($lg(zzList,zzi)) = ..DeserializeObject($Piece(zzArgument,"=",2), $lg($lg(zzList,zzi),2))
 	}
-	Kill Obj,Arguments,Argument,i,Id,List
 ]]></Implementation>
 </Method>
 
