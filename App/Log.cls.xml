@@ -221,6 +221,7 @@ Convert list of method arguments to string</Description>
 <ProcedureBlock>0</ProcedureBlock>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
+	New OldIORedirected, OldMnemonic, OldIO, Str
 	Set OldIORedirected = ##class(%Device).ReDirectIO()
 	Set OldMnemonic = ##class(%Device).GetMnemonicRoutine()
 	Set OldIO = $io
