@@ -12,7 +12,7 @@ ClassMethod Test(a As %Integer = 1, ByRef b = 2)
 /// do ##class(dc.dev.Use).TestWithObjects()
 ClassMethod TestWithObjects(a As %Integer = 1, b As %ZEN.proxyObject)
 {
-	$$$LogWarn("User message")
+	$$$LogWarn("User message") // just place this macro in user code you wish to log for Objects
 }
 
 }
