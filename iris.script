@@ -8,6 +8,6 @@
 
 
     zn "IRISAPP"
-    ; zpm "load /opt/irisbuild/ -v":1:1
-    do $SYSTEM.OBJ.ImportDir("/opt/irisbuild/src/dc/dev",, "ck") 
+    zpm "load /opt/irisbuild/ -v":1:1
+    ;do $SYSTEM.OBJ.ImportDir("/opt/irisbuild/src/dc/dev",, "ck") 
     halt

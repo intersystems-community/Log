@@ -64,5 +64,3 @@ Import directory with IRIS code
 ```
 do $SYSTEM.OBJ.ImportDir("/opt/irisbuild/src",, "ck") 
 ```   
-
-d ##class(dc.dev.Use).Test()

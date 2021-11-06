@@ -1,4 +1,4 @@
-Class dc.dev.Log Extends %Persistent
+Class dc.dev.logging.Log Extends %Persistent
 {
 
 /// Replacement for missing values

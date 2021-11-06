@@ -1,11 +1,11 @@
-ROUTINE dc.dev.LogMacro [Type=INC]
+ROUTINE dc.dev.logging.LogMacro [Type=INC]
 #define StackPlace 		$st($st(-1),"PLACE")
 #define CurrentClass 	##Expression($$$quote(%classname))
 #define CurrentMethod 	##Expression($$$quote(%methodname))
 
-#define MethodArguments ##Expression(##class(dc.dev.Log).GetMethodArguments(%classname,%methodname))
+#define MethodArguments ##Expression(##class(dc.dev.logging.Log).GetMethodArguments(%classname,%methodname))
 
-#define LogEvent(%type, %message) Do ##class(dc.dev.Log).AddRecord($$$CurrentClass,$$$CurrentMethod,$$$StackPlace,%type,$$$MethodArguments,%message)
+#define LogEvent(%type, %message) Do ##class(dc.dev.logging.Log).AddRecord($$$CurrentClass,$$$CurrentMethod,$$$StackPlace,%type,$$$MethodArguments,%message)
 #define LogNone(%message) 		$$$LogEvent("NONE", %message)
 #define LogError(%message) 		$$$LogEvent("ERROR", %message)
 #define LogFatal(%message) 		$$$LogEvent("FATAL", %message)

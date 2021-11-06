@@ -1,9 +1,9 @@
-Include dc.dev.LogMacro
+Include dc.dev.logging.LogMacro
 
-Class dc.dev.Use [ CompileAfter = dc.dev.Log ]
+Class dc.dev.logging.Use [ CompileAfter = dc.dev.logging.Log ]
 {
 
-/// do ##class(dc.dev.Use).Test()
+/// do ##class(dc.dev.logging.Use).Test()
 ClassMethod Test(a As %Integer = 1, ByRef b = 2)
 {
 	$$$LogWarn("User message") // just place this macro in user code you wish to log
