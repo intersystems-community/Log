@@ -1,3 +1,0 @@
-/App/Log.inc
-App.Log.CLS
-App.Use.CLS

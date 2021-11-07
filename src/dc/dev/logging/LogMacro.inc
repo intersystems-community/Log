@@ -1,13 +1,11 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Export generator="Cache" version="25" zv="Cache for Windows (x86-64) 2015.1 (Build 429U)" ts="2015-05-19 20:21:37">
-<Routine name="App.LogMacro" type="INC" timestamp="63691,73249.952234"><![CDATA[
+ROUTINE dc.dev.logging.LogMacro [Type=INC]
 #define StackPlace 		$st($st(-1),"PLACE")
 #define CurrentClass 	##Expression($$$quote(%classname))
 #define CurrentMethod 	##Expression($$$quote(%methodname))
 
-#define MethodArguments ##Expression(##class(App.Log).GetMethodArguments(%classname,%methodname))
+#define MethodArguments ##Expression(##class(dc.dev.logging.Log).GetMethodArguments(%classname,%methodname))
 
-#define LogEvent(%type, %message) Do ##class(App.Log).AddRecord($$$CurrentClass,$$$CurrentMethod,$$$StackPlace,%type,$$$MethodArguments,%message)
+#define LogEvent(%type, %message) Do ##class(dc.dev.logging.Log).AddRecord($$$CurrentClass,$$$CurrentMethod,$$$StackPlace,%type,$$$MethodArguments,%message)
 #define LogNone(%message) 		$$$LogEvent("NONE", %message)
 #define LogError(%message) 		$$$LogEvent("ERROR", %message)
 #define LogFatal(%message) 		$$$LogEvent("FATAL", %message)
@@ -16,6 +14,3 @@
 #define LogStat(%message) 		$$$LogEvent("STAT", %message)
 #define LogDebug(%message) 		$$$LogEvent("DEBUG", %message)
 #define LogRaw(%message) 		$$$LogEvent("RAW", %message)
-
-]]></Routine>
-</Export>
