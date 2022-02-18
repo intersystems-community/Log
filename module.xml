@@ -3,7 +3,7 @@
   <Document name="dc-dev-logging.ZPM">
     <Module>
       <Name>dc-dev-logging</Name>
-      <Version>1.0.1</Version>
+      <Version>1.22.1</Version>
       <Packaging>module</Packaging>
       <SourcesRoot>src</SourcesRoot>
       <Resource Name="dc.dev.logging.PKG"/>
